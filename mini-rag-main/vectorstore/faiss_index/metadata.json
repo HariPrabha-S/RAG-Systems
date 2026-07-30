@@ -1,0 +1,513 @@
+[
+  {
+    "id": "binding_and_storage.pdf::p1::c0",
+    "document": "binding_and_storage.pdf",
+    "page": 1,
+    "text": "Binding & Storage Allocation\nScope determines where a name can be referenced, and local referencing determines how a variable's\nstorage behaves once a function is called. Binding ties these two ideas together: it is the process of\nassociating an attribute — such as a type, a value, or a memory address — with a name. Understanding binding and storage allocation explains why static locals persist, why stack variables\nvanish after a function returns, and why pointers can reach across function boundaries. 1. What is Binding? A binding is an association between an entity, such as a variable name, and a property of that entity,\nsuch as its type, its value, or the memory location it occupies. The moment at which this association is\nmade is called the binding time. Binding time has a major influence on language flexibility,\nperformance, and error-checking: bindings made earlier (e.g. at compile time) tend to be faster to use\nbut less flexible, while bindings made later (e.g.",
+    "chunk_index": 0
+  },
+  {
+    "id": "binding_and_storage.pdf::p1::c1",
+    "document": "binding_and_storage.pdf",
+    "page": 1,
+    "text": "r (e.g. at compile time) tend to be faster to use\nbut less flexible, while bindings made later (e.g. at run time) are more flexible but carry runtime\noverhead. 2. Binding Times\nBinding Time\nExample\nNotes\nLanguage design time\nMeaning of the + operator\nFixed when the language itself is designed\nLanguage implementation timeRange of the int type\nFixed by the compiler/runtime vendor\nCompile time\nType of a statically typed variable\nDetermined when source code is compiled\nLink / load time\nAddress of a global variable\nResolved when modules are combined and loaded\nRun time\nValue of a local variable\nDetermined while the program executes\nA binding is described as static if it is completed before run time and remains fixed for the program's\nentire execution. A binding is described as dynamic if it is established, or can change, during run time. The static-versus-dynamic distinction applies not only to scope (as covered in static and dynamic\nscope) but also to storage allocation, which is the subject of the next section.",
+    "chunk_index": 1
+  },
+  {
+    "id": "binding_and_storage.pdf::p2::c2",
+    "document": "binding_and_storage.pdf",
+    "page": 2,
+    "text": "Binding & Storage Allocation\n3. Storage Allocation Categories\nEvery variable needs memory in which to store its value, and the moment that memory is set aside —\nalong with how long it remains reserved — defines the variable's storage class. Programming\nlanguages generally recognize four categories of storage allocation. 3.1 Static Allocation\nStatic variables are bound to a single memory cell before program execution begins, and that binding\ndoes not change for the lifetime of the program. Global variables and variables declared with the static\nkeyword inside a function fall into this category. Because the address is fixed at compile or link time,\naccessing a static variable is fast and requires no extra runtime bookkeeping. 3.2 Stack-Dynamic Allocation\nStack-dynamic variables are allocated on the call stack when their declaration is encountered during\nexecution, and they are deallocated when the enclosing block or function exits.",
+    "chunk_index": 2
+  },
+  {
+    "id": "binding_and_storage.pdf::p2::c3",
+    "document": "binding_and_storage.pdf",
+    "page": 2,
+    "text": "s encountered during\nexecution, and they are deallocated when the enclosing block or function exits. Ordinary local variables\nand function parameters in C use stack-dynamic allocation. Because the binding of storage is created\nand destroyed dynamically, recursive functions can have multiple, independent instances of the same\nlocal variable active at once, one per activation record on the stack. 3.3 Explicit Heap-Dynamic Allocation\nExplicit heap-dynamic variables are allocated and deallocated at programmer-specified points during\nexecution, using operators or functions such as malloc() and free() in C, or new and delete in C++. The\nstorage lives in the heap and is accessed indirectly through a pointer variable.",
+    "chunk_index": 3
+  },
+  {
+    "id": "binding_and_storage.pdf::p2::c4",
+    "document": "binding_and_storage.pdf",
+    "page": 2,
+    "text": "delete in C++. The\nstorage lives in the heap and is accessed indirectly through a pointer variable. int *p = malloc(sizeof(int));  // heap allocation\n*p = 42;\nfree(p);                       // explicit deallocation\n3.4 Implicit Heap-Dynamic Allocation\nImplicit heap-dynamic allocation occurs whenever a variable is bound to heap storage only when it is\nassigned a value, with no explicit allocation request from the programmer. Languages such as Python\nand JavaScript use this approach extensively for objects, lists, and dictionaries. It offers great flexibility,\nbut at the cost of runtime overhead for allocation and garbage collection.",
+    "chunk_index": 4
+  },
+  {
+    "id": "binding_and_storage.pdf::p3::c5",
+    "document": "binding_and_storage.pdf",
+    "page": 3,
+    "text": "Binding & Storage Allocation\n4. Storage Class Comparison\nStorage Class\nAllocated When\nDeallocated When\nTypical Region\nStatic\nBefore execution begins\nProgram termination\nStatic data segment\nStack-dynamic\nBlock/function entry\nBlock/function exit\nCall stack\nExplicit heap-dynamic\nProgrammer request (malloc)Programmer request (free)\nHeap\nImplicit heap-dynamic\nOn assignment\nGarbage collected\nHeap\n5. How This Connects to Scope and Local Referencing\nScope rules (covered in Scope & Scope Rules) describe where a name is visible in the source code,\nwhile storage allocation describes how long the underlying memory actually exists. A static local\nvariable, as introduced in Local Referencing & Parameter Passing, demonstrates this distinction\nclearly: its scope is still limited to the function in which it is declared, but its storage class is static, so its\nlifetime spans the whole program. Parameter passing also depends directly on storage allocation.",
+    "chunk_index": 5
+  },
+  {
+    "id": "binding_and_storage.pdf::p3::c6",
+    "document": "binding_and_storage.pdf",
+    "page": 3,
+    "text": "its\nlifetime spans the whole program. Parameter passing also depends directly on storage allocation. When an argument is passed by value,\nthe parameter is a fresh stack-dynamic variable, deallocated as soon as the function returns. When an\nargument is passed by reference using a pointer, the pointer itself is stack-dynamic, but the address it\nholds may refer to storage with a completely different lifetime — static, stack-dynamic in an outer\nframe, or heap-dynamic.",
+    "chunk_index": 6
+  },
+  {
+    "id": "binding_and_storage.pdf::p4::c7",
+    "document": "binding_and_storage.pdf",
+    "page": 4,
+    "text": "Binding & Storage Allocation\n6. Worked Example\nThe example below combines a static local variable with a pointer parameter, showing binding and\nstorage allocation working together. #include <stdio.h>\n// 'history' is static: storage is allocated once, before main() runs\nvoid recordAndDouble(int *value) {\n  static int callHistory = 0;\n  callHistory++;\n  // 'value' is a stack-dynamic pointer parameter\n  // it holds the address of a variable owned by the caller\n  *value = *value * 2;\n  printf(\"Call #%d -> new value: %d\\n\", callHistory, *value);\n}\nint main() {\n  int score = 5;\n  recordAndDouble(&score);  // score becomes 10\n  recordAndDouble(&score);  // score becomes 20\n  printf(\"Final score: %d\\n\", score);\n  return 0;\n}\nOutput\nCall #1 -> new value: 10\nCall #2 -> new value: 20\nFinal score: 20\nHere, callHistory keeps counting across both calls because it has static storage, exactly like the count\nvariable in the earlier trackCalls() example.",
+    "chunk_index": 7
+  },
+  {
+    "id": "binding_and_storage.pdf::p4::c8",
+    "document": "binding_and_storage.pdf",
+    "page": 4,
+    "text": "because it has static storage, exactly like the count\nvariable in the earlier trackCalls() example. The pointer value is bound to a different address on each\ncall, but since that address points to the same score variable in main(), the modification persists in the\ncaller, just as in the reallyChange() example. 7. Quick Reference: Binding Properties\nG\nStatic binding is fixed before run time; dynamic binding is established, or can change, during\nexecution. G\nStorage allocation determines a variable's lifetime; scope rules determine its visibility — related but\nindependent properties.",
+    "chunk_index": 8
+  },
+  {
+    "id": "binding_and_storage.pdf::p5::c9",
+    "document": "binding_and_storage.pdf",
+    "page": 5,
+    "text": "Binding & Storage Allocation\n8. Dangling Pointers and Lifetime Mismatches\nA common class of bugs arises when a pointer outlives the storage it refers to. If a function returns the\naddress of a stack-dynamic local variable, that memory is reclaimed the moment the function returns,\nyet the pointer still appears to be valid. Dereferencing it afterward produces undefined behavior, since\nthe memory may have already been reused by another function call. // INCORRECT: returns the address of a stack-dynamic variable\nint *badFunction() {\n  int localVal = 99;\n  return &localVal;  // localVal is destroyed when the function returns\n}\nTo avoid this, a function that must return a usable address should either return the address of a static\nvariable, or allocate the memory explicitly on the heap and hand ownership of that memory to the\ncaller. 9. Conclusion\nBinding and storage allocation form the bridge between the compile-time idea of scope and the\nrun-time idea of lifetime.",
+    "chunk_index": 9
+  },
+  {
+    "id": "binding_and_storage.pdf::p5::c10",
+    "document": "binding_and_storage.pdf",
+    "page": 5,
+    "text": "allocation form the bridge between the compile-time idea of scope and the\nrun-time idea of lifetime. Static binding gives predictable, low-overhead access to data that must\npersist, while stack-dynamic and heap-dynamic allocation provide the flexibility needed for recursion,\ndynamic data structures, and parameter passing. Recognizing which storage class a variable belongs\nto is essential for predicting program behavior, avoiding dangling references, and writing C programs\nthat manage memory correctly.",
+    "chunk_index": 10
+  },
+  {
+    "id": "lifetimevariable_garbagecollection.pdf::p1::c11",
+    "document": "lifetimevariable_garbagecollection.pdf",
+    "page": 1,
+    "text": "LIFETIME & GARBAGE COLLECTION \n1. Introduction \nIn programming languages, variables and objects occupy memory during program \nexecution. Two important concepts related to memory management are lifetime and \ngarbage collection. While scope defines where a variable can be accessed, lifetime defines how long the \nvariable exists in memory. Garbage collection is a mechanism used to automatically reclaim unused memory, \nespecially for heap-dynamic variables. 2. Lifetime \nLifetime of a variable is defined as the time duration during which the variable is bound \nto a memory location during program execution. In simple words, lifetime answers: \n“For how long does this variable exist in memory?” \nLifetime is a runtime concept and is independent of scope. 3. Importance of Lifetime \n• \nEfficient use of memory \n• \nAvoids memory wastage \n• \nSupports recursion and dynamic data structures \n• \nHelps in understanding memory-related errors such as dangling pointers and \nmemory leaks \n4.",
+    "chunk_index": 11
+  },
+  {
+    "id": "lifetimevariable_garbagecollection.pdf::p1::c12",
+    "document": "lifetimevariable_garbagecollection.pdf",
+    "page": 1,
+    "text": "VIGNESH L S \n1\n\nres \n• \nHelps in understanding memory-related errors such as dangling pointers and \nmemory leaks \n4. Categories of Variable Lifetime \n4.1 Static Lifetime \n• \nVariables exist throughout the entire execution of the program \n• \nMemory allocated before program execution and released after program \ntermination \nExamples: \n• \nGlobal variables \n• \nStatic variables \nExample: \nstatic int x; \nAdvantages: \n• \nFast access \n• \nSimple implementation",
+    "chunk_index": 12
+  },
+  {
+    "id": "lifetimevariable_garbagecollection.pdf::p2::c13",
+    "document": "lifetimevariable_garbagecollection.pdf",
+    "page": 2,
+    "text": "VIGNESH L S \n2\n\nLIFETIME & GARBAGE COLLECTION \nDisadvantages: \n• \nMemory occupied even when variable is not used \n4.2 Stack-Dynamic Lifetime \n• \nVariables are created when a function or block is entered \n• \nDestroyed when the function or block exits \n• \nMemory allocated on the runtime stack \nExamples: \n• \nLocal variables \n• \nFunction parameters \nExample: \nvoid fun()  \n{ \n    int y;   // stack-dynamic variable \n} \nAdvantages: \n• \nSupports recursion \n• \nAutomatic allocation and deallocation \nDisadvantages: \n• \nSize must be known at compile time \n4.3 Explicit Heap-Dynamic Lifetime \n• \nVariables allocated and deallocated explicitly by the programmer \n• \nMemory taken from the heap \nExamples: \n• \nmalloc() and free() in C \n• \nnew and delete in C++ \nExample: \nint *p = (int*)malloc(sizeof(int)); \nfree(p);",
+    "chunk_index": 13
+  },
+  {
+    "id": "lifetimevariable_garbagecollection.pdf::p3::c14",
+    "document": "lifetimevariable_garbagecollection.pdf",
+    "page": 3,
+    "text": "VIGNESH L S \n3\n\nLIFETIME & GARBAGE COLLECTION \nAdvantages: \n• \nFlexible memory usage \n• \nSuitable for dynamic data structures \nDisadvantages: \n• \nProgrammer errors may cause: \no Memory leaks \no Dangling pointers\n\n4.4 Implicit Heap-Dynamic Lifetime \n• \nVariables allocated automatically at runtime \n• \nDeallocation handled by garbage collector \n• \nCommon in modern high-level languages \nExamples: \n• \nObjects in Java, Python, C# \nExample: \nObject obj = new Object(); \nAdvantages: \n• \nSafe and simple memory management \n• \nNo explicit deallocation required \nDisadvantages: \n• \nGarbage collection overhead \n5. Garbage Collection \nGarbage collection is the automatic process of reclaiming heap memory that is no longer \nreachable or usable by the program. \nGarbage refers to allocated memory that cannot be accessed by any active reference. \nGarbage collection is mainly used for heap-dynamic variables. \n6. Need for Garbage Collection \n• \nPrevents memory leaks \n• \nAvoids dangling references \n• \nReduces programmer burden",
+    "chunk_index": 14
+  },
+  {
+    "id": "lifetimevariable_garbagecollection.pdf::p4::c15",
+    "document": "lifetimevariable_garbagecollection.pdf",
+    "page": 4,
+    "text": "VIGNESH L S \n4\n\nLIFETIME & GARBAGE COLLECTION \n• \nImproves reliability and safety of programs \n7. Garbage Collection Techniques \n7.1 Reference Counting \n• \nEach object maintains a count of references \n• \nCount incremented when reference is created \n• \nCount decremented when reference is destroyed \n• \nObject is reclaimed when count becomes zero \nAdvantages: \n• \nSimple to implement \nDisadvantages: \n• \nCannot handle circular references \n7.2 Mark-and-Sweep \nSteps: \n1. Mark phase – all reachable objects are marked \n2. Sweep phase – unmarked objects are reclaimed \nAdvantages: \n• \nHandles circular references \nDisadvantages: \n• \nProgram execution may pause during collection \n7.3 Copying Garbage Collection \n• \nHeap divided into two regions \n• \nLive objects copied to the new region \n• \nOld region cleared completely \nAdvantages: \n• \nFast allocation \n• \nNo fragmentation \nDisadvantages: \n• \nRequires extra memory \n8. Problems Without Garbage Collection",
+    "chunk_index": 15
+  },
+  {
+    "id": "lifetimevariable_garbagecollection.pdf::p5::c16",
+    "document": "lifetimevariable_garbagecollection.pdf",
+    "page": 5,
+    "text": "VIGNESH L S \n5\n\nLIFETIME & GARBAGE COLLECTION \n• \nMemory leaks \n• \nDangling pointers \n• \nProgram crashes \n• \nReduced system performance \n9. Relationship Between Lifetime and Garbage Collection \n• \nHeap-dynamic variables have unpredictable lifetimes \n• \nGarbage collection automatically terminates the lifetime of unreachable objects \n• \nEnsures safe and efficient memory usage \n10. Conclusion \nLifetime defines the existence duration of variables in memory, while garbage collection \nprovides an automatic mechanism to reclaim unused heap memory. \nModern programming languages widely adopt garbage collection to improve safety, \nreliability, and ease of programming, making memory management less error-prone.",
+    "chunk_index": 16
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p1::c17",
+    "document": "localreferencing_parameters.pdf",
+    "page": 1,
+    "text": "Local Referencing & Parameter Passing\nLocal referencing describes how variables declared inside a function are created, stored, and\ndestroyed during program execution. C provides two main kinds of local variables — stack-dynamic\n(normal) variables and static local variables — which differ in how long their storage persists. Static vs. Normal Local Variables\nA normal local variable is allocated on the call stack each time its enclosing function is invoked, and it is\ndestroyed when the function returns. A static local variable, in contrast, is allocated once in a fixed\nmemory region and retains its value across multiple calls to the function. #include <stdio.h>\nvoid trackCalls()\n{\n  // 1. Static local variable\n  // It is initialized only ONCE when the program starts. static int count = 0;\n  // 2. Normal (stack-dynamic) variable\n  // It is recreated every time the function is called.",
+    "chunk_index": 17
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p1::c18",
+    "document": "localreferencing_parameters.pdf",
+    "page": 1,
+    "text": "= 0;\n  // 2. Normal (stack-dynamic) variable\n  // It is recreated every time the function is called. int localCount = 0;\n  count++;      // This persists\n  localCount++; // This resets to 0 every time\n  printf(\"Static Count: %d | Normal Count: %d\\n\", count, localCount);\n}\nint main()\n{\n  trackCalls(); // Output: Static Count: 1 | Normal Count: 1\n  trackCalls(); // Output: Static Count: 2 | Normal Count: 1\n  trackCalls(); // Output: Static Count: 3 | Normal Count: 1\n  return 0;\n}\nOutput\nStatic Count: 1 | Normal Count: 1\nStatic Count: 2 | Normal Count: 1\nStatic Count: 3 | Normal Count: 1",
+    "chunk_index": 18
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p2::c19",
+    "document": "localreferencing_parameters.pdf",
+    "page": 2,
+    "text": "Local Referencing & Parameter Passing\nWhy Static Variables Persist\nBecause a static local variable is allocated in the program's static data segment rather than on the\nstack, it is initialized exactly once, the first time the declaration is encountered. Every subsequent call\nto the function reuses the same memory location, so updates made in one call are visible in the next. This makes static locals useful for counters, caches, and one-time setup flags, while keeping that state\nhidden from the rest of the program. 1. Pass by Value (The Default)\nIn this method, C makes a copy of the variable. The function gets its own \"scratch pad\" (stack-dynamic\nmemory) to play with. Any modification made to the parameter inside the function affects only this local\ncopy and has no effect on the original variable in the caller.",
+    "chunk_index": 19
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p2::c20",
+    "document": "localreferencing_parameters.pdf",
+    "page": 2,
+    "text": "the function affects only this local\ncopy and has no effect on the original variable in the caller. #include <stdio.h>\n// This function receives a COPY of the number\nvoid tryToChange(int x) {\n  x = x + 100;\n  printf(\"Inside function: %d\\n\", x);\n}\nint main() {\n  int myNumber = 10;\n  tryToChange(myNumber);\n  // The original remains 10 because only the copy was changed\n  printf(\"Outside function: %d\\n\", myNumber);\n  return 0;\n}\nOutput\nInside function: 110\nOutside function: 10",
+    "chunk_index": 20
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p3::c21",
+    "document": "localreferencing_parameters.pdf",
+    "page": 3,
+    "text": "Local Referencing & Parameter Passing\n2. Pass by Reference (Using Pointers)\nC doesn't have a \"true\" pass-by-reference like some other languages, so we use pointers. Instead of\nsending the value, we send the address (where the variable lives in memory). This allows the function\nto reach back into the caller's memory and modify the original variable directly, rather than working on a\ndisposable copy. #include <stdio.h>\n// This function receives the ADDRESS of the number\nvoid reallyChange(int *ptr) {\n  *ptr = *ptr + 100; // Go to that address and change the value\n}\nint main() {\n  int myNumber = 10;\n  reallyChange(&myNumber); // Send the address of myNumber\n  // Now it is 110 because we edited the original memory cell\n  printf(\"After pointer change: %d\\n\", myNumber);\n  return 0;\n}\nOutput\nAfter pointer change: 110\nWhy This Works\nWhen &myNumber is passed, the function receives the memory address of myNumber, stored in the\npointer ptr.",
+    "chunk_index": 21
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p3::c22",
+    "document": "localreferencing_parameters.pdf",
+    "page": 3,
+    "text": "myNumber is passed, the function receives the memory address of myNumber, stored in the\npointer ptr. Dereferencing the pointer with *ptr lets the function read and write the actual memory cell\nthat myNumber occupies. Since both main() and reallyChange() are now looking at the exact same\nlocation in memory, the change made inside the function is visible outside it as well.",
+    "chunk_index": 22
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p4::c23",
+    "document": "localreferencing_parameters.pdf",
+    "page": 4,
+    "text": "Local Referencing & Parameter Passing\nPass by Value vs. Pass by Reference\nAspect\nPass by Value\nPass by Reference (Pointer)\nWhat is passed\nA copy of the value\nThe memory address\nOriginal variable\nUnaffected\nCan be modified\nSyntax\nvoid f(int x)\nvoid f(int *ptr)\nCall site\nf(num)\nf(&num)\nAccess inside function\nDirect (x)\nDereferenced (*ptr)\nTypical use\nSafe, read-only inputs\nUpdating multiple outputs\nPass by Pointer vs. Pass by Reference (Conceptual)\nIt is worth noting that languages such as C++ provide true reference parameters (e.g. void f(int &x)),\nwhich behave like an alias for the caller's variable without requiring explicit dereferencing syntax. C\nonly offers pointers, so the programmer must manually take the address with & at the call site and\ndereference it with * inside the function. Both techniques achieve the same underlying goal: giving the\ncalled function direct access to the caller's storage.",
+    "chunk_index": 23
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p4::c24",
+    "document": "localreferencing_parameters.pdf",
+    "page": 4,
+    "text": "achieve the same underlying goal: giving the\ncalled function direct access to the caller's storage. When to Use Each Method\nbullet\nUse pass by value when the function only needs to read the data and should not be able to alter the\ncaller's variable. bullet\nUse pass by value for small, simple data types such as int, char, or float, where copying is cheap. bullet\nUse pass by reference (pointers) when the function must modify the original variable, such as\nswapping two values. bullet\nUse pass by reference when a function needs to return more than one result, since C functions can\nonly return a single value directly. bullet\nUse pass by reference for large structures or arrays to avoid the overhead of copying large amounts\nof data.",
+    "chunk_index": 24
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p5::c25",
+    "document": "localreferencing_parameters.pdf",
+    "page": 5,
+    "text": "Local Referencing & Parameter Passing\nLocal Referencing and Memory Layout\nEvery running C program organizes its memory into distinct regions. Normal local variables and\nfunction parameters live on the stack, which grows and shrinks automatically as functions are called\nand return. Static local variables live in the program's static data segment, which is allocated once\nwhen the program loads and persists for the program's entire lifetime. Pointers themselves are usually\nstack-allocated, but the addresses they hold can point anywhere — the stack, the static segment, or\nthe heap. Common Pitfalls\nbullet\nReturning the address of a normal local variable from a function results in a dangling pointer, since\nthat stack memory is reclaimed once the function returns. bullet\nForgetting to dereference a pointer parameter (writing ptr = ptr + 100 instead of *ptr = *ptr + 100)\nupdates the local copy of the address rather than the value it points to.",
+    "chunk_index": 25
+  },
+  {
+    "id": "localreferencing_parameters.pdf::p5::c26",
+    "document": "localreferencing_parameters.pdf",
+    "page": 5,
+    "text": "tead of *ptr = *ptr + 100)\nupdates the local copy of the address rather than the value it points to. bullet\nAssuming a static local variable resets between calls, when in fact it retains its value for the lifetime\nof the program. bullet\nMixing up the unary & (address-of) and * (dereference) operators, which are opposites of one\nanother. Summary\nLocal referencing determines how a variable's storage is created and destroyed within a function, with\nstatic locals persisting across calls and normal locals being recreated each time. Parameter passing\ndetermines how arguments reach a function: pass by value hands over a disposable copy, leaving the\ncaller's data untouched, while pass by reference (via pointers) hands over the actual memory address,\nallowing the function to modify the original data directly. Together, these two concepts explain how C\nprograms manage data flow between functions while balancing safety, performance, and flexibility.",
+    "chunk_index": 26
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p1::c27",
+    "document": "scope_and_scoperules.pdf",
+    "page": 1,
+    "text": "SCOPE & SCOPE RULES\nA Detailed Study Note on Programming Language Concepts\n1. Introduction\nIn programming languages, names (identifiers) such as variables, functions, and constants must be\nassociated with specific program entities. This association, known as binding, links a name to a\nmemory location, a value, a type, or a piece of code. Without a systematic way of managing these\nassociations, large programs would quickly become unmanageable due to accidental name clashes\nand unpredictable behavior. Scope and scope rules define where and how these names can be referenced within a program. Proper scope management is essential for program correctness, readability, modularity, and efficient\nimplementation. Every modern programming language, whether procedural, object-oriented, or\nfunctional, relies on a well-defined set of scope rules to determine which declaration of a name is\nactive at any given point in the source code.",
+    "chunk_index": 27
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p1::c28",
+    "document": "scope_and_scoperules.pdf",
+    "page": 1,
+    "text": "cope rules to determine which declaration of a name is\nactive at any given point in the source code. Understanding scope is also foundational to understanding how compilers build symbol tables and\ndetect errors such as undeclared variables or illegal references. 2. Scope\nScope is defined as the region of a program in which a particular name binding is visible and can be\nlegally referenced. In simple terms, scope answers the question: “Where in the program can this\nvariable or name be used?”\nScope is a compile-time concept in most modern programming languages. This means that, for\nstatically scoped languages, a compiler can determine the scope of every identifier simply by\nanalyzing the structure of the source code, without needing to execute the program. This property\nmakes static analysis tools, IDE auto-completion, and early error detection possible. 3.",
+    "chunk_index": 28
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p1::c29",
+    "document": "scope_and_scoperules.pdf",
+    "page": 1,
+    "text": "is property\nmakes static analysis tools, IDE auto-completion, and early error detection possible. 3. Importance of Scope\nScope plays a vital role in several aspects of language design and software engineering:\nbullet\nAvoiding name conflicts across different parts of a program. bullet\nSupporting modular programming and independent module development. bullet\nImproving program readability and clarity of variable usage. bullet\nEnabling separate compilation of files or modules. bullet\nAssisting the compiler in symbol table construction. bullet\nEnforcing encapsulation of implementation details. bullet\nReducing memory overhead via stack-based allocation.",
+    "chunk_index": 29
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p2::c30",
+    "document": "scope_and_scoperules.pdf",
+    "page": 2,
+    "text": "4. Types of Scope\n4.1 Global Scope\nA name declared outside all program units (functions, procedures, classes) is said to have global\nscope. Such a name is accessible throughout the program unless hidden by a local declaration of the\nsame name. Global variables are convenient for sharing state across many parts of a program, but\nexcessive use can make code harder to maintain and debug, since any function may modify the\nglobal state. Example:\nint x = 10; // global scope\n4.2 Local Scope\nA name declared inside a function or block has local scope and is accessible only within that function\nor block. Local variables typically exist only for the duration of the function call (their lifetime is tied to\nthe activation record on the call stack), and they are not visible to other functions. Example:\nvoid fun() { int y = 20; // local scope }\n4.3 Block Scope\nBlock scope limits the visibility of a name to a specific block delimited by braces { }.",
+    "chunk_index": 30
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p2::c31",
+    "document": "scope_and_scoperules.pdf",
+    "page": 2,
+    "text": "Block Scope\nBlock scope limits the visibility of a name to a specific block delimited by braces { }. This is common in\nstructured and object-oriented languages such as C, C++, Java, and C#. A variable declared inside\nan if-block, for-loop, or while-loop is only visible within that block and ceases to exist once the block\nfinishes executing. Example:\nif (true) { int z = 30; // block scope }\n4.4 Nested Scope\nProgramming languages that allow blocks to be nested inside one another support nested scope. Inner blocks can access identifiers declared in outer blocks, but outer blocks cannot access variables\ndeclared inside inner blocks. This creates a hierarchy of scopes, often visualized as a tree, where\nname resolution proceeds outward from the innermost enclosing block until a matching declaration is\nfound. If an inner block declares a variable with the same name as one in an outer block, the inner\ndeclaration temporarily hides the outer one for the remainder of that inner block.",
+    "chunk_index": 31
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p2::c32",
+    "document": "scope_and_scoperules.pdf",
+    "page": 2,
+    "text": "block, the inner\ndeclaration temporarily hides the outer one for the remainder of that inner block. This is known as\nvariable shadowing.",
+    "chunk_index": 32
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p3::c33",
+    "document": "scope_and_scoperules.pdf",
+    "page": 3,
+    "text": "5. Scope Rules\nScope rules determine which declaration of a variable is used when multiple declarations with the\nsame name exist in different, possibly overlapping, regions of a program. Specifically, scope rules specify:\nbullet\nThe binding of names to variables — how and when an identifier is associated with a storage\nlocation. bullet\nThe visibility of identifiers — which parts of the program can legally reference a given name. bullet\nThe order of searching declarations — the sequence in which nested or enclosing scopes are\nexamined to resolve a name. Two major scope rules are used in programming languages:\nbullet\nStatic (Lexical) Scope\nbullet\nDynamic Scope\n6. Static (Lexical) Scope\nDefinition\nIn static scope, the binding of a variable is determined by the program's lexical structure, i.e., the\nphysical placement of declarations in the source code. bullet\nBinding is decided at compile time. bullet\nThe compiler can determine scope without executing the program.",
+    "chunk_index": 33
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p3::c34",
+    "document": "scope_and_scoperules.pdf",
+    "page": 3,
+    "text": "g is decided at compile time. bullet\nThe compiler can determine scope without executing the program. Example:\nint x = 10; void f() { printf(\"%d\", x); }\nHere, x refers to the global variable because that is the nearest enclosing declaration in the program\ntext. Characteristics\nbullet\nMost widely used scope rule in modern languages. bullet\nPredictable and easy to understand, since the scope of a name can be read directly from the\nsource code. bullet\nEfficient implementation, typically using a stack of activation records and compile-time address\nresolution. bullet\nSupports nested blocks and modularity, allowing large programs to be decomposed cleanly. Languages Using Static Scope",
+    "chunk_index": 34
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p4::c35",
+    "document": "scope_and_scoperules.pdf",
+    "page": 4,
+    "text": "C, C++, Java, Python, Ada, Pascal\n7. Dynamic Scope\nDefinition\nIn dynamic scope, the binding of a variable is determined by the execution order of function calls, not\nby the program structure. bullet\nBinding is decided at runtime. bullet\nVariable references depend on the call stack at the moment of execution. Example (conceptual):\nx = 10 function f() { print x } function g() { x = 20 f() } g()\nUnder dynamic scope, f() prints 20 because the most recent active declaration of x is in g(). Characteristics\nbullet\nLess predictable, since the meaning of a variable reference can change depending on the call\nsequence. bullet\nHarder to debug and maintain, because understanding a function's behavior may require tracing\nthe entire call history. bullet\nRarely used in modern general-purpose languages. bullet\nUseful in certain scripting and experimental languages where dynamic context-sensitive behavior\nis desirable. Languages Using Dynamic Scope\nbullet\nEarly Lisp dialects\nbullet\nSome shell scripting environments\n8.",
+    "chunk_index": 35
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p4::c36",
+    "document": "scope_and_scoperules.pdf",
+    "page": 4,
+    "text": "Languages Using Dynamic Scope\nbullet\nEarly Lisp dialects\nbullet\nSome shell scripting environments\n8. Static Scope vs Dynamic Scope\nAspect\nStatic Scope\nDynamic Scope\nBinding time\nCompile time\nRuntime\nDepends on\nProgram structure\nCall sequence\nPredictability\nHigh\nLow\nImplementation\nSimple\nComplex",
+    "chunk_index": 36
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p5::c37",
+    "document": "scope_and_scoperules.pdf",
+    "page": 5,
+    "text": "Modern usage\nVery common\nRare\n9. Scope vs Lifetime\nAlthough often confused, scope and lifetime are different concepts. Scope is a textual, compile-time\nproperty describing where in the source code a name can be legally referenced. Lifetime, on the other\nhand, is a runtime property describing the period during which a variable actually occupies storage in\nmemory. Concept\nMeaning\nScope\nWhere a variable can be accessed\nLifetime\nHow long a variable exists in memory\nA variable may exist in memory but still not be accessible due to scope restrictions. For instance, a\nstatic local variable in C retains its value across function calls (its lifetime spans the entire program\nexecution), yet it remains accessible only within the function in which it is declared (its scope is local). This distinction is essential when reasoning about memory management, closures, and garbage\ncollection in modern languages. 10. Conclusion\nScope and scope rules are fundamental concepts in programming language design.",
+    "chunk_index": 37
+  },
+  {
+    "id": "scope_and_scoperules.pdf::p5::c38",
+    "document": "scope_and_scoperules.pdf",
+    "page": 5,
+    "text": "uages. 10. Conclusion\nScope and scope rules are fundamental concepts in programming language design. They govern\nhow identifiers are bound to entities, how names are resolved when multiple declarations exist, and\nhow programs are organized into manageable, modular units. Most modern languages adopt static (lexical) scoping due to its predictability, efficiency, and ease of\nimplementation. Static scoping allows compilers to perform thorough error checking before a program\never runs, and it gives programmers a clear, structural way to reason about variable visibility simply\nby reading the source code. Understanding scope rules helps programmers write correct, modular, and maintainable programs\nand aids compiler designers in efficient symbol management. A solid grasp of these concepts is\nessential not only for writing better code, but also for understanding the inner workings of compilers,\ninterpreters, and the broader theory of programming languages.",
+    "chunk_index": 38
+  },
+  {
+    "id": "semantic_calls.pdf::p1::c39",
+    "document": "semantic_calls.pdf",
+    "page": 1,
+    "text": "Overloaded Methods · Generic Methods · Design Issues · Semantics of Call and\nReturn\n1. Overloaded Methods\nDefinition:\nOverloading is a programming mechanism that allows multiple methods or functions to share the same\nname within the same scope, provided they are distinguishable by the number, order, or types of their\nparameters. This concept is formally known as ad hoc polymorphism because each overloaded variant is a\nseparate, distinct definition — the compiler simply chooses the correct one at compile time. Why Overloading Matters:\nWithout overloading, a programmer who needs to add two integers and also add two floating-point\nnumbers would be forced to invent two different names — for example, add_int and add_float. This clutters\nthe code with unnecessary naming complexity. Overloading lets both operations share the natural name\n'add', and the compiler resolves which version to invoke by examining the argument types at the call site. This leads to more readable, intuitive, and maintainable code.",
+    "chunk_index": 39
+  },
+  {
+    "id": "semantic_calls.pdf::p1::c40",
+    "document": "semantic_calls.pdf",
+    "page": 1,
+    "text": "the argument types at the call site. This leads to more readable, intuitive, and maintainable code. How the Compiler Resolves Overloads:\nWhen the compiler encounters a function call, it examines the types and count of the arguments provided. It then searches all visible definitions with that name and selects the one whose formal parameter list best\nmatches the actual arguments. If no exact match exists, the compiler may attempt implicit type promotion\n— for example, promoting an int to a double. If the match remains ambiguous (two definitions are equally\nvalid), the compiler reports an error rather than guessing. Operator Overloading:\nC++ extends the overloading concept to built-in operators such as +, -, *, and ==. A programmer can\ndefine what it means to add two objects of a user-defined class using the familiar + symbol, rather than\ncalling a named function like add().",
+    "chunk_index": 40
+  },
+  {
+    "id": "semantic_calls.pdf::p1::c41",
+    "document": "semantic_calls.pdf",
+    "page": 1,
+    "text": "f a user-defined class using the familiar + symbol, rather than\ncalling a named function like add(). This makes user-defined types feel as natural to use as primitive types,\nand is especially powerful for mathematical or scientific types such as complex numbers, vectors, or\nmatrices. Java, by contrast, does not allow operator overloading for user-defined types, keeping the\nlanguage simpler but less expressive in this regard. C++ Overloading — Illustrated Walkthrough:\nConsider two functions both named 'add'. The first accepts two integer parameters and returns their\ninteger sum. The second accepts two double parameters and returns their double sum. When add(10, 20)\nis written in main, the compiler sees two integer literals and selects the integer version. When add(10.5,\n20.4) appears, the compiler sees double literals and selects the double version. The programmer writes\none name; the compiler does the disambiguation automatically. VIGNESH L S\nPage 1",
+    "chunk_index": 41
+  },
+  {
+    "id": "semantic_calls.pdf::p2::c42",
+    "document": "semantic_calls.pdf",
+    "page": 2,
+    "text": "Overloaded Methods · Generic Methods · Design Issues · Semantics of Call and\nReturn\n2. Generic Methods\nDefinition:\nA generic subprogram is one that is written once using a placeholder type, and then automatically adapted\nby the compiler for any concrete type that is used with it. This mechanism is known as parametric\npolymorphism — the subprogram is parameterized not only over data values, but also over data types\nthemselves. The Problem Generics Solve:\nImagine writing a swap function that exchanges two integer values. Later you need to swap two doubles. Without generics, you must write two nearly identical functions that differ only in their type declarations. As\nthe number of types grows, this duplication becomes burdensome and error-prone. A generic function\nsolves this by writing the algorithm once with an abstract type T, and letting the compiler instantiate T as\nint, double, or any other type as needed. Templates in C++:\nIn C++, generic programming is accomplished through the template mechanism.",
+    "chunk_index": 42
+  },
+  {
+    "id": "semantic_calls.pdf::p2::c43",
+    "document": "semantic_calls.pdf",
+    "page": 2,
+    "text": "eeded. Templates in C++:\nIn C++, generic programming is accomplished through the template mechanism. The programmer prefixes\na function definition with 'template <class T>' and then uses T as a stand-in for any type throughout the\nfunction body. When the function is called with integer arguments, the compiler silently generates a\ncompiled integer version. When called with double arguments, it generates a double version. The\nprogrammer never sees these generated copies — they are handled transparently. Advantages of Generic Methods:\nGeneric methods promote code reuse at the highest level. A single well-written sorting algorithm, for\ninstance, can sort arrays of integers, strings, or any user-defined type that supports a comparison\noperator. Generic containers — such as vectors, stacks, queues, and maps in the C++ Standard Template\nLibrary (STL) — are all built on this principle.",
+    "chunk_index": 43
+  },
+  {
+    "id": "semantic_calls.pdf::p2::c44",
+    "document": "semantic_calls.pdf",
+    "page": 2,
+    "text": "acks, queues, and maps in the C++ Standard Template\nLibrary (STL) — are all built on this principle. The result is highly reusable, type-safe code with no runtime\nperformance penalty, because all type resolution happens at compile time. Generics in Other Languages:\nJava introduced generics in version 5.0 using angle-bracket syntax such as List<T>. Unlike C++\ntemplates, Java generics use type erasure — the type parameter is removed at runtime, and the compiled\nbytecode works with a raw Object internally. This differs from C++ where each instantiation produces a\ndistinct compiled copy. Python, being dynamically typed, achieves a similar effect naturally: any function\nthat does not make type-specific assumptions already works with any type, making explicit generics less\nnecessary. VIGNESH L S\nPage 2",
+    "chunk_index": 44
+  },
+  {
+    "id": "semantic_calls.pdf::p3::c45",
+    "document": "semantic_calls.pdf",
+    "page": 3,
+    "text": "Overloaded Methods · Generic Methods · Design Issues · Semantics of Call and\nReturn\n3. Design Issues for Functions\nOverview:\nFunctions are subprograms specifically designed to compute and return a value. When a language\ndesigner creates a programming language, several important decisions must be made about how\nfunctions behave. The three most significant design issues are: whether side effects are permitted, what\ntypes of values may be returned, and how parameters are passed into the function. Return Types:\nEarly languages like Fortran restricted functions to returning only scalar values such as integers or reals. Modern languages are far more flexible. C++ allows functions to return any type, including user-defined\nstructures (structs) and classes. It also permits returning a reference to an existing object, avoiding the\noverhead of copying. Java allows returning any object reference.",
+    "chunk_index": 45
+  },
+  {
+    "id": "semantic_calls.pdf::p3::c46",
+    "document": "semantic_calls.pdf",
+    "page": 3,
+    "text": "to an existing object, avoiding the\noverhead of copying. Java allows returning any object reference. Python can return tuples, lists,\ndictionaries, or any object, enabling a function to effectively return multiple values simultaneously. Side Effects:\nA side effect occurs when a function modifies a variable that exists outside its own local scope. Pure\nfunctional languages like Haskell forbid side effects entirely, ensuring that a function called with the same\narguments always returns the same result — a property called referential transparency. Imperative\nlanguages like C and C++ allow side effects, typically through pass-by-reference parameters or global\nvariables. While useful, uncontrolled side effects make programs harder to reason about and test. Parameter Passing and the Reference Mode:\nC++ defaults to pass-by-value, meaning the function receives a copy of each argument. However, C++\nalso offers pass-by-reference using the ampersand symbol.",
+    "chunk_index": 46
+  },
+  {
+    "id": "semantic_calls.pdf::p3::c47",
+    "document": "semantic_calls.pdf",
+    "page": 3,
+    "text": "ives a copy of each argument. However, C++\nalso offers pass-by-reference using the ampersand symbol. When a parameter is declared as a reference\ntype, the function operates directly on the caller's variable rather than on a copy. This enables the function\nto modify the caller's data — a controlled side effect — without requiring raw pointer syntax. The\nprogrammer can also declare a const reference, which gives the function efficient read-only access to a\nlarge object without allowing modification. Returning Composite Types — Example Concept:\nIn C++, a function named 'calculate' might accept two integers and a reference integer as parameters,\nthen return a struct containing both the sum and the product of the inputs, while simultaneously writing the\ndifference into the reference parameter. This illustrates all three design concerns at once: a composite\nreturn type, a controlled side effect via the reference parameter, and mixed parameter passing modes in a\nsingle function signature. VIGNESH L S\nPage 3",
+    "chunk_index": 47
+  },
+  {
+    "id": "semantic_calls.pdf::p4::c48",
+    "document": "semantic_calls.pdf",
+    "page": 4,
+    "text": "Overloaded Methods · Generic Methods · Design Issues · Semantics of Call and\nReturn\n4. Semantics of Call and Return\nDefinition — Subprogram Linkage:\nThe subprogram call and return operations of a programming language are collectively called its\nsubprogram linkage. This linkage encompasses the full set of mechanisms required to transfer control\nfrom a caller to a callee, execute the callee's body, and return control — along with any result value —\nback to the caller. It is one of the most fundamental runtime mechanisms in any imperative language. The Activation Record (Stack Frame):\nEvery time a subprogram is called, the runtime system creates a data structure called an activation record,\nalso known as a stack frame.",
+    "chunk_index": 48
+  },
+  {
+    "id": "semantic_calls.pdf::p4::c49",
+    "document": "semantic_calls.pdf",
+    "page": 4,
+    "text": "he runtime system creates a data structure called an activation record,\nalso known as a stack frame. This record is pushed onto the runtime stack and stores all information\nneeded for that particular invocation: the values of formal parameters, the values of local variables, the\nreturn address (the memory location in the caller where execution should resume after the call), and a\ndynamic link pointing to the caller's activation record. When the subprogram finishes, its activation record\nis popped from the stack, and control returns to the address stored in the return address field. Call Semantics — Step by Step:\nWhen a caller invokes a subprogram, the following sequence occurs. First, the caller evaluates each\nactual parameter expression and stores the resulting values. Second, it saves its own execution state —\nincluding the values of CPU registers it is currently using — so they can be restored later.",
+    "chunk_index": 49
+  },
+  {
+    "id": "semantic_calls.pdf::p4::c50",
+    "document": "semantic_calls.pdf",
+    "page": 4,
+    "text": "state —\nincluding the values of CPU registers it is currently using — so they can be restored later. Third, it places\nthe computed parameter values where the callee expects them (typically in CPU registers or on the stack). Fourth, it saves the return address — the address of the instruction immediately after the call. Finally,\ncontrol is transferred to the first instruction of the callee's body. Return Semantics — Step by Step:\nWhen a subprogram reaches its return statement, the following cleanup occurs. First, if the subprogram is\na function, the return value is moved to a well-known location — typically a CPU register — where the\ncaller knows to find it. Second, the stack pointer is adjusted to deallocate the callee's activation record,\nreclaiming the memory used for its local variables. Third, the saved register values are restored so the\ncaller's computation can resume correctly. Finally, control is transferred back to the return address, and\nthe caller continues execution from where it left off.",
+    "chunk_index": 50
+  },
+  {
+    "id": "semantic_calls.pdf::p4::c51",
+    "document": "semantic_calls.pdf",
+    "page": 4,
+    "text": "s transferred back to the return address, and\nthe caller continues execution from where it left off. VIGNESH L S\nPage 4",
+    "chunk_index": 51
+  },
+  {
+    "id": "semantic_calls.pdf::p5::c52",
+    "document": "semantic_calls.pdf",
+    "page": 5,
+    "text": "Overloaded Methods · Generic Methods · Design Issues · Semantics of Call and\nReturn\n4. Semantics of Call and Return (Continued) — Recursion\nRecursion and the Runtime Stack:\nThe activation record model handles recursive calls naturally and elegantly. Because each invocation of a\nsubprogram receives its own fresh activation record on the stack, multiple simultaneous calls to the same\nfunction do not interfere with one another. Each call has its own private copy of its parameters and local\nvariables, isolated from all other calls. Tracing Factorial(3) Through the Stack:\nConsider a recursive factorial function. When main calls factorial(3), the runtime creates an activation\nrecord storing the parameter n=3 and the return address back to main. Because the result of factorial(3)\ndepends on factorial(2), a second activation record is pushed for n=2. Similarly, factorial(2) calls\nfactorial(1), pushing a third record with n=1.",
+    "chunk_index": 52
+  },
+  {
+    "id": "semantic_calls.pdf::p5::c53",
+    "document": "semantic_calls.pdf",
+    "page": 5,
+    "text": "cord is pushed for n=2. Similarly, factorial(2) calls\nfactorial(1), pushing a third record with n=1. At this point the stack holds three activation records for the\nsame function, each with a different value of n. The Unwinding Process:\nThe base case, factorial(1), returns the value 1 without making further recursive calls. Its activation record\nis popped, and the value 1 is passed back to the waiting factorial(2) call. factorial(2) multiplies 2 by 1 to get\n2, then its own activation record is popped, returning 2 to factorial(3). Finally, factorial(3) multiplies 3 by 2\nto get 6, pops its record, and returns 6 to main. This sequential unwinding of the stack is the fundamental\nmechanism underlying all recursive computation. Stack Overflow and Tail Recursion:\nA critical limitation of the activation record model is stack depth. Each recursive call consumes stack\nspace, and if the recursion depth is very large, the stack can run out of memory — a condition called stack\noverflow.",
+    "chunk_index": 53
+  },
+  {
+    "id": "semantic_calls.pdf::p5::c54",
+    "document": "semantic_calls.pdf",
+    "page": 5,
+    "text": "recursion depth is very large, the stack can run out of memory — a condition called stack\noverflow. Some languages and compilers mitigate this through tail-call optimisation: if the last action of a\nfunction is to return the result of a recursive call with no further computation, the compiler can reuse the\ncurrent activation record instead of creating a new one, making the recursion as efficient as a loop. Summary of the Complete Topic:\nOverloading allows the same function name to serve multiple parameter signatures, resolved at compile\ntime through ad hoc polymorphism. Generic methods extend this idea by parameterising over types\nthrough templates or generics, implementing parametric polymorphism. Function design issues require\nlanguage designers to decide on return types, side-effect policies, and parameter-passing strategies.",
+    "chunk_index": 54
+  },
+  {
+    "id": "semantic_calls.pdf::p5::c55",
+    "document": "semantic_calls.pdf",
+    "page": 5,
+    "text": "anguage designers to decide on return types, side-effect policies, and parameter-passing strategies. Semantics of call and return describe how the runtime stack, activation records, return addresses, and\nregister saving combine to implement correct and efficient subprogram execution — including recursive\nexecution — in any imperative language. VIGNESH L S\nPage 5",
+    "chunk_index": 55
+  },
+  {
+    "id": "subprograms.pdf::p1::c56",
+    "document": "subprograms.pdf",
+    "page": 1,
+    "text": "Sub Programs & Design Issues\n1. Subprograms\n1.1 Introduction\nA subprogram is a named, self-contained block of code that is designed to perform one specific,\nwell-defined task. It is written once and can be invoked any number of times from other parts of the\nprogram. When invoked, control transfers from the calling unit to the subprogram; when the subprogram\nfinishes its task, control returns to the caller, optionally along with a computed result value. Subprograms are the cornerstone of structured programming. They enable large, complex programs to be\nbroken into manageable, independently testable units. They promote modularity by giving each unit a clear\ninterface and hiding its internal implementation from the rest of the program. They encourage abstraction,\nreusability, and maintainability — key qualities of large-scale software development. Without subprograms,\neven moderately complex programs would consist of enormous, unreadable blocks of sequential code.",
+    "chunk_index": 56
+  },
+  {
+    "id": "subprograms.pdf::p1::c57",
+    "document": "subprograms.pdf",
+    "page": 1,
+    "text": "s,\neven moderately complex programs would consist of enormous, unreadable blocks of sequential code. 1.2 Theoretical Concept\nIn programming language theory, a subprogram is described as a control abstraction mechanism. Abstraction here means that the programmer defines a general operation by giving it a name and a\nparameter interface, while hiding all the implementation details inside the body. The caller only needs to\nknow what the subprogram does and what arguments it requires — not how it works internally. When a subprogram is called, the following sequence of events occurs: control transfers from the caller to\nthe callee; the formal parameters are bound to the actual argument values; local variables inside the\nsubprogram are allocated; the body statements execute; and finally, control returns to the caller at the\npoint immediately after the call statement. This sequence is governed by the call-return model, which is\nuniversal across all imperative programming languages.",
+    "chunk_index": 57
+  },
+  {
+    "id": "subprograms.pdf::p1::c58",
+    "document": "subprograms.pdf",
+    "page": 1,
+    "text": "s governed by the call-return model, which is\nuniversal across all imperative programming languages. 1.3 Classification of Subprograms\nSubprograms are broadly classified into two categories. Procedures perform actions and produce effects\n— they do not return a value to the caller. A procedure might print output, update a data structure, or\nmodify global state. Functions, on the other hand, compute and return a value, making them suitable for\nuse inside expressions. In the C programming language, this distinction is blurred: all subprograms are\nwritten as functions, with void-returning functions serving as procedures. VIGNESH L S\nPage 1",
+    "chunk_index": 58
+  },
+  {
+    "id": "subprograms.pdf::p2::c59",
+    "document": "subprograms.pdf",
+    "page": 2,
+    "text": "Sub Programs & Design Issues\n1.4 Characteristics of Subprograms\nEvery subprogram, regardless of the language, shares four fundamental characteristics. First, it has a\nsingle entry point — execution always begins at the first statement of the subprogram's body. Second, it\nhas a single conceptual exit point — even if a language allows multiple return statements, the caller\nalways resumes at the same place after the subprogram finishes. Third, it has a parameter interface — a\nformal list of named placeholders that will be filled with actual argument values each time it is called. Fourth, it maintains a local referencing environment — variables declared inside the subprogram are\nvisible only within it, and cease to exist when the subprogram returns. 1.5 The Subprogram Definition — Explained in Depth\nConsider a C function named 'square' that takes one integer and returns its square. The integer parameter\nx is the formal parameter — a named placeholder that acts as a blank to be filled when the function is\ncalled.",
+    "chunk_index": 59
+  },
+  {
+    "id": "subprograms.pdf::p2::c60",
+    "document": "subprograms.pdf",
+    "page": 2,
+    "text": "ormal parameter — a named placeholder that acts as a blank to be filled when the function is\ncalled. The body of the function contains the logic (multiplying x by itself), fully encapsulated so that the\nrest of the program does not need to know how the computation is done, only that it can be done. The\nreturn type 'int' declared before the function name tells the compiler what kind of value the function will\nhand back. The Subprogram Call — Detailed Analysis\nIn main, the statement 'int result = square(5)' is the call site. The literal value 5 is the actual parameter,\nalso called an argument. When the CPU executes this statement, it pauses main and transfers control to\nthe beginning of the square function. Simultaneously, a stack frame (activation record) is created for\nsquare, storing the local copy of x (initialised to 5) and the return address — the memory address of the\ninstruction in main that should execute after square finishes.",
+    "chunk_index": 60
+  },
+  {
+    "id": "subprograms.pdf::p2::c61",
+    "document": "subprograms.pdf",
+    "page": 2,
+    "text": "n address — the memory address of the\ninstruction in main that should execute after square finishes. Parameter Passing — Pass-by-Value\nThe square example demonstrates pass-by-value, the most fundamental parameter passing mode. The\nactual argument value 5 is copied into the local variable x inside square. If square were to modify x\ninternally (e.g., setting x to zero), that modification would only affect the local copy — the variable in main\nremains completely unaffected. This property is called referential integrity: the subprogram cannot\naccidentally corrupt the caller's data. Pass-by-value is the default in C and C++, and is the safest mode for\nsmall scalar values.",
+    "chunk_index": 61
+  },
+  {
+    "id": "subprograms.pdf::p2::c62",
+    "document": "subprograms.pdf",
+    "page": 2,
+    "text": "r's data. Pass-by-value is the default in C and C++, and is the safest mode for\nsmall scalar values. Integration into the Calling Program\nOnce square finishes executing, four things happen in quick succession: the computed result (25) is\nplaced in a CPU register or memory location where the caller expects to find it; the stack frame for square\nis popped, reclaiming its memory; control returns to main at the saved return address; and the returned\nvalue 25 is assigned to the variable result. Main then continues normally. VIGNESH L S\nPage 2",
+    "chunk_index": 62
+  },
+  {
+    "id": "subprograms.pdf::p3::c63",
+    "document": "subprograms.pdf",
+    "page": 3,
+    "text": "Sub Programs & Design Issues\nSummary of Subprogram Benefits\nThe square example illustrates three core software-engineering benefits of subprograms. Abstraction:\nmain does not need to know how squaring is computed; it simply requests the result. Reusability:\nsquare(10), square(20), or square with any other argument can be computed without rewriting the\nmultiplication logic. Maintainability: if the implementation needs to change — say, to handle doubles\ninstead of ints — only the single function definition needs updating, not every place in the program where\nsquaring is performed. DESIGN ISSUES\n2.1 Parameter Passing Mechanisms\nParameter passing is the protocol that governs how data moves from the caller to the subprogram. It is\none of the most consequential design decisions in any programming language, because it determines the\ndegree of coupling between the caller and the callee. Pass-by-Value creates a copy of the actual parameter. The subprogram works entirely on this copy.",
+    "chunk_index": 63
+  },
+  {
+    "id": "subprograms.pdf::p3::c64",
+    "document": "subprograms.pdf",
+    "page": 3,
+    "text": "e. Pass-by-Value creates a copy of the actual parameter. The subprogram works entirely on this copy. The\nadvantage is safety — the original data cannot be accidentally changed. The disadvantage is efficiency:\ncopying large structures or arrays consumes significant time and memory. Pass-by-Reference passes the memory address of the actual parameter rather than its value. The\nsubprogram directly reads and writes the caller's variable through this address. No copying is required,\nmaking it efficient for large data structures. However, a bug in the subprogram can corrupt variables in the\ncalling program, and reasoning about the program's behaviour becomes more complex. Pass-by-Value-Result (also called copy-in/copy-out) is a hybrid. The value is copied into the subprogram\nat the start, and then the final value of the parameter is copied back into the caller's variable when the\nsubprogram returns.",
+    "chunk_index": 64
+  },
+  {
+    "id": "subprograms.pdf::p3::c65",
+    "document": "subprograms.pdf",
+    "page": 3,
+    "text": "final value of the parameter is copied back into the caller's variable when the\nsubprogram returns. This avoids aliasing problems that can arise with pass-by-reference, while still\nallowing the subprogram to pass a result back through the parameter. 2.2 Parameter Type Checking\nType checking determines when and how the compiler or runtime verifies that the types of actual\narguments match the types expected by the formal parameters. Static type checking, used in C and Java,\noccurs at compile time. Any type mismatch is caught before the program ever runs, preventing an entire\nclass of runtime crashes. Dynamic type checking, used in Python and JavaScript, occurs at runtime,\noffering greater flexibility at the cost of potential unexpected failures during execution. Implicit conversion\n(coercion) allows the language to automatically convert an int to a float when necessary; strongly typed\nlanguages like Ada typically forbid coercion to minimise errors. VIGNESH L S\nPage 3",
+    "chunk_index": 65
+  },
+  {
+    "id": "subprograms.pdf::p4::c66",
+    "document": "subprograms.pdf",
+    "page": 4,
+    "text": "Sub Programs & Design Issues\n2.3 Local Referencing Environment (Scope)\nThe local referencing environment of a subprogram defines which variables are visible — that is, in scope\n— during that subprogram's execution. This is determined by the language's scoping rules. Static scope (also called lexical scope) determines visibility based on the physical structure of the source\ncode as written. A subprogram can access variables defined in its own body, and also variables defined in\nenclosing textual scopes (outer functions or the global scope). If a variable is not found in the local scope,\nthe compiler looks outward in the statically enclosing blocks. C uses static scoping. This is highly\npredictable and easy to reason about because visibility depends only on where code is written, not on how\nit is called. Dynamic scope determines visibility based on the calling sequence at runtime.",
+    "chunk_index": 66
+  },
+  {
+    "id": "subprograms.pdf::p4::c67",
+    "document": "subprograms.pdf",
+    "page": 4,
+    "text": "t on how\nit is called. Dynamic scope determines visibility based on the calling sequence at runtime. A subprogram can access\nvariables defined in whichever function called it, and in that function's caller, and so on up the call chain. This makes programs very difficult to predict and debug, because the meaning of a variable name\ndepends on the runtime execution path, which may vary. For this reason, dynamic scoping has largely\nfallen out of favour and is not used in modern general-purpose languages. 2.4 Subprogram Nesting\nSubprogram nesting refers to the ability to define a function inside another function. Languages like Pascal\nand Python allow nesting, creating a hierarchy of visibility. An inner function can see and use the variables\nof its enclosing outer function, which is useful for writing helper routines that are only relevant to one\nspecific outer function. This keeps helper routines private and avoids polluting the global namespace. C and standard C++ generally disallow nesting.",
+    "chunk_index": 67
+  },
+  {
+    "id": "subprograms.pdf::p4::c68",
+    "document": "subprograms.pdf",
+    "page": 4,
+    "text": "es private and avoids polluting the global namespace. C and standard C++ generally disallow nesting. All functions exist at the global level. While this simplifies\nthe compiler and the runtime stack considerably, it requires more careful naming conventions to avoid\nconflicts when the global namespace becomes crowded. C++ partially addresses this with namespaces\nand class member functions, which provide logical grouping without full nesting. 2.5 Lifetime of Local Variables\nThe lifetime of a variable refers to the period during program execution when that variable exists in\nmemory and holds a valid value. Static allocation means the variable exists for the entire duration of the program, from startup to\ntermination. In C, a local variable declared with the 'static' keyword has static lifetime even though it is\nlocally scoped. It retains its value between calls to the function.",
+    "chunk_index": 68
+  },
+  {
+    "id": "subprograms.pdf::p4::c69",
+    "document": "subprograms.pdf",
+    "page": 4,
+    "text": "tatic lifetime even though it is\nlocally scoped. It retains its value between calls to the function. Stack dynamic allocation (the C default for all local variables) means the variable is created when the\nfunction is called and destroyed when the function returns. This is efficient and enables recursion, because\neach recursive call gets its own fresh set of local variables on the stack. The memory is automatically\nreclaimed when the function exits. VIGNESH L S\nPage 4",
+    "chunk_index": 69
+  },
+  {
+    "id": "subprograms.pdf::p5::c70",
+    "document": "subprograms.pdf",
+    "page": 5,
+    "text": "Sub Programs & Design Issues\n2.6 Analysis of Design Decisions in Practice\nTo see all the design issues working together, consider a simple C display function that accepts an integer\nparameter and prints it. Three major design decisions are simultaneously visible in this tiny snippet. First, pass-by-value: the integer parameter is a local copy inside the function. If display were to modify it,\nthe variable in main would remain unchanged, preserving referential integrity. Second, static scope: if\ndisplay tries to use a variable named x that is not defined inside it, the C compiler looks at the global scope\n— the code written outside all functions — rather than at the scope of whatever function happened to call\ndisplay. Third, stack allocation: the memory for the parameter is allocated on the runtime stack the\nmoment display is called, and is automatically freed the moment the closing brace is reached. This\nmemory then becomes available for other parts of the program.",
+    "chunk_index": 70
+  },
+  {
+    "id": "subprograms.pdf::p5::c71",
+    "document": "subprograms.pdf",
+    "page": 5,
+    "text": "ent the closing brace is reached. This\nmemory then becomes available for other parts of the program. Comprehensive Summary Table\nDesign Issue\nOptions\nLanguage Examples\nParameter Passing\nBy \nValue, \nBy \nReference, \nBy\nValue-Result\nC (value), C++ (both), Ada (all three)\nType Checking\nStatic \n(compile-time), \nDynamic\n(runtime)\nC/Java (static), Python/JS (dynamic)\nScope Rule\nStatic (lexical), Dynamic\nC/Python (static), early Lisp (dynamic)\nSubprogram Nesting\nAllowed, Disallowed\nPython/Pascal (yes), C/C++ (no)\nVariable Lifetime\nStatic, Stack Dynamic\nstatic keyword (static), default locals\n(stack)\nReturn Types\nScalar only, Any type, Reference\nOld Fortran (scalar), C++/Java (any)\nSide Effects\nAllowed, Forbidden\nC/C++ (allowed), Haskell (forbidden)\nUnderstanding these design issues is essential for any programmer working across multiple languages.",
+    "chunk_index": 71
+  },
+  {
+    "id": "subprograms.pdf::p5::c72",
+    "document": "subprograms.pdf",
+    "page": 5,
+    "text": "Understanding these design issues is essential for any programmer working across multiple languages. A\ndecision that seems obvious in one language — such as pass-by-value in C — is a deliberate choice with\nclear trade-offs, and recognising those trade-offs enables programmers to write safer, more efficient, and\nmore portable code. VIGNESH L S\nPage 5",
+    "chunk_index": 72
+  }
+]

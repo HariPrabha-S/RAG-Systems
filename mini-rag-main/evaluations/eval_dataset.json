@@ -1,0 +1,182 @@
+[
+  {
+    "query_id": "q1",
+    "question": "What is the formal definition of overloading in programming?",
+    "gold_chunk_text": "Overloading is a programming mechanism that allows multiple methods or functions to share the same name within the same scope, provided they are distinguishable by the number, order, or types of their parameters.",
+    "source_doc": "semantic_calls.pdf"
+  },
+  {
+    "query_id": "q2",
+    "question": "What is function overloading formally known as?",
+    "gold_chunk_text": "This concept is formally known as ad hoc polymorphism because each overloaded variant is a separate, distinct definition",
+    "source_doc": "semantic_calls.pdf"
+  },
+  {
+    "query_id": "q3",
+    "question": "How does a compiler choose the correct function definition when encountering an overload?",
+    "gold_chunk_text": "When the compiler encounters a function call, it examines the types and count of the arguments provided. It then searches all visible definitions with that name and selects the one whose formal parameter list best matches the actual arguments.",
+    "source_doc": "semantic_calls.pdf"
+  },
+  {
+    "query_id": "q4",
+    "question": "What fundamental runtime mechanism underlies all recursive computation?",
+    "gold_chunk_text": "This sequential unwinding of the stack is the fundamental mechanism underlying all recursive computation.",
+    "source_doc": "semantic_calls.pdf"
+  },
+  {
+    "query_id": "q5",
+    "question": "How do some compilers mitigate the limitation of stack depth during recursion?",
+    "gold_chunk_text": "Some languages and compilers mitigate this through tail-call optimisation: if the last action of a function is to return the result of a recursive call with no further computation, the compiler can reuse the current activation record instead of creating a new one",
+    "source_doc": "semantic_calls.pdf"
+  },
+  {
+    "query_id": "q6",
+    "question": "What is the definition of a subprogram?",
+    "gold_chunk_text": "A subprogram is a named, self-contained block of code that is designed to perform one specific, well-defined task.",
+    "source_doc": "subprograms.pdf"
+  },
+  {
+    "query_id": "q7",
+    "question": "How is a subprogram described in programming language theory?",
+    "gold_chunk_text": "In programming language theory, a subprogram is described as a control abstraction mechanism.",
+    "source_doc": "subprograms.pdf"
+  },
+  {
+    "query_id": "q8",
+    "question": "What sequence of events occurs when a subprogram is invoked?",
+    "gold_chunk_text": "When invoked, control transfers from the calling unit to the subprogram; when the subprogram finishes its task, control returns to the caller, optionally along with a computed result value.",
+    "source_doc": "subprograms.pdf"
+  },
+  {
+    "query_id": "q9",
+    "question": "What benefits do subprograms promote in structured programming?",
+    "gold_chunk_text": "They encourage abstraction, reusability, and maintainability - key qualities of large-scale software development. Without subprograms, even moderately complex programs would consist of enormous, unreadable blocks of sequential code.",
+    "source_doc": "subprograms.pdf"
+  },
+  {
+    "query_id": "q10",
+    "question": "Which parameter passing options are used in the Ada programming language?",
+    "gold_chunk_text": "\"Parameter Passing\n\",\"Options\n\",\"Language Examples\n\"\r\n\"Parameter Passing\n\",\"By Value, By Reference, By\n Value-Result\n\",\"C (value), C++ (both), Ada (all three)\n\"",
+    "source_doc": "subprograms.pdf"
+  },
+  {
+    "query_id": "q11",
+    "question": "What is the general definition of binding in computer systems?",
+    "gold_chunk_text": "Binding ties these two ideas together: it is the process of associating an attribute - such as a type, a value, or a memory address - with a name.",
+    "source_doc": "binding_and_storage.pdf"
+  },
+  {
+    "query_id": "q12",
+    "question": "What is meant by the phrase binding time?",
+    "gold_chunk_text": "A binding is an association between an entity, such as a variable name, and a property of that entity... The moment at which this association is made is called the binding time.",
+    "source_doc": "binding_and_storage.pdf"
+  },
+  {
+    "query_id": "q13",
+    "question": "When is the meaning of the plus operator fixed in a language?",
+    "gold_chunk_text": "\"Language design time\n\",\"Meaning of the + operator\n\",\"Fixed when the language itself is designed\n\"",
+    "source_doc": "binding_and_storage.pdf"
+  },
+  {
+    "query_id": "q14",
+    "question": "What common class of memory bugs arises when a pointer outlives its storage?",
+    "gold_chunk_text": "A common class of bugs arises when a pointer outlives the storage it refers to. If a function returns the address of a stack-dynamic local variable, that memory is reclaimed the moment the function returns, yet the pointer still appears to be valid.",
+    "source_doc": "binding_and_storage.pdf"
+  },
+  {
+    "query_id": "q15",
+    "question": "What type of address should a function return to safely hand ownership over to a caller?",
+    "gold_chunk_text": "To avoid this, a function that must return a usable address should either return the address of a static variable, or allocate the memory explicitly on the heap and hand ownership of that memory to the caller.",
+    "source_doc": "binding_and_storage.pdf"
+  },
+  {
+    "query_id": "q16",
+    "question": "What does local referencing describe during execution?",
+    "gold_chunk_text": "Local referencing describes how variables declared inside a function are created, stored, and destroyed during program execution.",
+    "source_doc": "localreferencing_parameters.pdf"
+  },
+  {
+    "query_id": "q17",
+    "question": "What is the main functional difference between a normal local variable and a static local variable?",
+    "gold_chunk_text": "A normal local variable is allocated on the call stack each time its enclosing function is invoked, and it is destroyed when the function returns. A static local variable, in contrast, is allocated once in a fixed memory region and retains its value across multiple calls to the function.",
+    "source_doc": "localreferencing_parameters.pdf"
+  },
+  {
+    "query_id": "q18",
+    "question": "Where are static local variables physically stored during a program's execution?",
+    "gold_chunk_text": "Because they live in the program's static data segment, which is allocated once when the program loads and persists for the program's entire lifetime.",
+    "source_doc": "localreferencing_parameters.pdf"
+  },
+  {
+    "query_id": "q19",
+    "question": "What happens to the data flow during a pass-by-value argument transmission?",
+    "gold_chunk_text": "pass by value hands over a disposable copy, leaving the caller's data untouched, while pass by reference (via pointers) hands over the actual memory address",
+    "source_doc": "localreferencing_parameters.pdf"
+  },
+  {
+    "query_id": "q20",
+    "question": "What pitfall happens when a programmer forgets to dereference a pointer parameter?",
+    "gold_chunk_text": "Forgetting to dereference a pointer parameter (writing $ptr=ptr+100$ instead of *ptr $r=^{*}ptr+100)$ updates the local copy of the address rather than the value it points to.",
+    "source_doc": "localreferencing_parameters.pdf"
+  },
+  {
+    "query_id": "q21",
+    "question": "What do scope and scope rules define within a program?",
+    "gold_chunk_text": "Scope and scope rules define where and how these names can be referenced within a program.",
+    "source_doc": "scope_and_scoperules.pdf"
+  },
+  {
+    "query_id": "q22",
+    "question": "What is the formal definition of a variable's scope?",
+    "gold_chunk_text": "Scope is defined as the region of a program in which a particular name binding is visible and can be legally referenced.",
+    "source_doc": "scope_and_scoperules.pdf"
+  },
+  {
+    "query_id": "q23",
+    "question": "Why do most modern programming languages adopt static scoping?",
+    "gold_chunk_text": "Most modern languages adopt static (lexical) scoping due to its predictability, efficiency, and ease of implementation. Static scoping allows compilers to perform thorough error checking before a program ever runs",
+    "source_doc": "scope_and_scoperules.pdf"
+  },
+  {
+    "query_id": "q24",
+    "question": "What is the key conceptual difference between scope and lifetime?",
+    "gold_chunk_text": "\"Scope\n\",\"Where a variable can be accessed\n\"\r\n\"Lifetime\n\",\"How long a variable exists in memory\n\"",
+    "source_doc": "scope_and_scoperules.pdf"
+  },
+  {
+    "query_id": "q25",
+    "question": "Can a variable retain an active lifetime but still be unreachable by scope rules?",
+    "gold_chunk_text": "A variable may exist in memory but still not be accessible due to scope restrictions. For instance, a static local variable in C retains its value across function calls (its lifetime spans the entire program\n execution), yet it remains accessible only within the function in which it is declared (its scope is local).",
+    "source_doc": "scope_and_scoperules.pdf"
+  },
+  {
+    "query_id": "q26",
+    "question": "What is the definition of a variable's lifetime?",
+    "gold_chunk_text": "Lifetime of a variable is defined as the time duration during which the variable is bound to a memory location during program execution.",
+    "source_doc": "lifetimevariable_garbagecollection.pdf"
+  },
+  {
+    "query_id": "q27",
+    "question": "What is the primary function of garbage collection systems?",
+    "gold_chunk_text": "Garbage collection is a mechanism used to automatically reclaim unused memory, especially for heap-dynamic variables.",
+    "source_doc": "lifetimevariable_garbagecollection.pdf"
+  },
+  {
+    "query_id": "q28",
+    "question": "What is a main disadvantage of using a reference counting garbage collection strategy?",
+    "gold_chunk_text": "Disadvantages: \n• \nCannot handle circular references",
+    "source_doc": "lifetimevariable_garbagecollection.pdf"
+  },
+  {
+    "query_id": "q29",
+    "question": "How does the mark-and-sweep garbage collector operate?",
+    "gold_chunk_text": "7.2 Mark-and-Sweep \n\nSteps: \n\n1. Mark phase - all reachable objects are marked \n\n2. Sweep phase - unmarked objects are reclaimed \n\nAdvantages: \n• \nHandles circular references",
+    "source_doc": "lifetimevariable_garbagecollection.pdf"
+  },
+  {
+    "query_id": "q30",
+    "question": "What software bugs occur in systems operating without functional garbage collection?",
+    "gold_chunk_text": "• \nMemory leaks \n• \nDangling pointers \n• \nProgram crashes \n• \nReduced system performance",
+    "source_doc": "lifetimevariable_garbagecollection.pdf"
+  }
+]

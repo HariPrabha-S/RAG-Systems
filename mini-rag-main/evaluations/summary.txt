@@ -1,0 +1,13 @@
+=================================================
+Mini-RAG Retrieval Evaluation Summary
+Date: 2026-07-10 22:32:46
+Number of Queries: 30
+Recall@10: 0.8000
+MRR: 0.6139
+nDCG@10: 0.6605
+Context Precision: 0.1600
+Average Latency: 931.04 ms
+Best Query: q1
+Worst Query: q8
+Total Runtime: 27.96 seconds
+=================================================

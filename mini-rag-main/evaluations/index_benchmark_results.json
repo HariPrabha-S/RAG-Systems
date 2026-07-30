@@ -1,0 +1,43 @@
+{
+  "n_vectors": 73,
+  "dim": 1024,
+  "n_queries": 30,
+  "results": [
+    {
+      "index": "Flat (Exact)",
+      "build_s": 0.0002707999665290117,
+      "latency_ms": 0.04982666422923406,
+      "recall": 1.0
+    },
+    {
+      "index": "IVF-Flat (nlist=18, nprobe=2)",
+      "build_s": 0.0034497000742703676,
+      "latency_ms": 0.004839998049040636,
+      "recall": 0.6066666666666667
+    },
+    {
+      "index": "IVF-PQ (m=64, nbits=5)",
+      "build_s": 0.041457099840044975,
+      "latency_ms": 0.014128664818902811,
+      "recall": 0.6066666666666667
+    },
+    {
+      "index": "HNSW (M=32, ef_c=200, ef_s=100)",
+      "build_s": 0.00603780010715127,
+      "latency_ms": 0.019661332480609417,
+      "recall": 1.0
+    },
+    {
+      "index": "HNSW (M=64, ef_c=400, ef_s=200)",
+      "build_s": 0.004750299965962768,
+      "latency_ms": 0.015085334889590742,
+      "recall": 1.0
+    },
+    {
+      "index": "HNSW+PQ (M=32, m=64, nbits=5)",
+      "build_s": 0.031072899932041764,
+      "latency_ms": 0.015300667534271877,
+      "recall": 0.7633333333333334
+    }
+  ]
+}
